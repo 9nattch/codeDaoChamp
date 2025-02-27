@@ -79,7 +79,7 @@ string getTitle(const Player& player) {
     }
 
     if (player.cash > 80000) return "Overnight millionaire";
-    if (totalProfit > player.startingMoney + 10000) return "The Deal Maker";
+    if (totalProfit > 4000) return "The Deal Maker";
     if (highRiskTrades > totalTrades / 2) return "The Risk Maverick";
     if (lowRiskTrades == totalTrades) return "The Safety Guru";
     if (cashRatio >= 0.7) return "The Money Hoarder";

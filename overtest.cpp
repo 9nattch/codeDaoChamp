@@ -225,18 +225,15 @@ void sellAllShares(Player& player, int stockPrice) {// ขายทั้งห�
 
 
 int main() {
-
-    SetConsoleShow("My Console App");//ตั้งชื่อ console
-    pair<int, string> result = generateMarketNews();
-    srand(time(0));
+    SetConsoleShow("My Console App");  // ตั้งชื่อ console
+    srand(time(0));  // ใช้เวลาในการสุ่มเลข
 
     int numPlayers;
-
-    while (true){
+    while (true) {
         cout << "Number of players (3-5): ";
-        if(cin >> numPlayers && numPlayers >= 3 && numPlayers <= 5){
+        if(cin >> numPlayers && numPlayers >= 3 && numPlayers <= 5) {
             break;
-        }else{
+        } else {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             SetConsoleColor(4);
@@ -246,64 +243,64 @@ int main() {
     }
 
     vector<Player> players = initializePlayers(numPlayers);
-    
-    SetConsoleColor(9);//สีฟ้า
+
+    SetConsoleColor(9);  // สีฟ้า
     cout << "\n=== Randomizing Starting Money ===\n";
     SetConsoleColor(7);
-
     randMoney(players);
 
     int stockPrice = 500;
     int rounds = 5;
-
     int graph[WIDTH], history[HISTORY_SIZE];
     loadHistory(history, graph);
 
-    pair<int, string> currentNews; // เก็บข่าวจากรอบก่อนหน้า
+    pair<int, string> currentNews;  // เก็บข่าวจากรอบก่อนหน้า
 
     for (int round = 1; round <= rounds; ++round) {
-       
         cout << "\n=== Round " << round << " ===\n";
-        
+
         if (round > 1) {
             // ใช้ข่าวที่สุ่มในรอบก่อนหน้าในการคำนวณราคาหุ้นในรอบนี้
             stockPrice = calculateStockPrice(currentNews.first);
         }
 
-        currentNews = generateMarketNews();
-        cout << "Market News: " << currentNews.second << "\n"; 
+        // สุ่มข่าวใหม่ในรอบนี้
+        currentNews = generateMarketNews();  
+        cout << "Market News: " << currentNews.second << "\n";  // แสดงข่าวที่สุ่มได้
 
-        
-        generateGraph(graph);
-        displayGraph(graph);
+        // เรียกใช้ฟังก์ชัน generateGraph เพื่อสร้างกราฟที่สัมพันธ์กับข่าว
+        generateGraph(graph, currentNews.first);  // ส่ง newsLine ของข่าวที่สุ่ม
+        displayGraph(graph);  // แสดงกราฟ
 
         displayStatus(players, stockPrice);
 
+        // ให้ผู้เล่นเล่นในรอบนี้
         for (auto& player : players) {
             playerTurn(player, stockPrice);
             displayStatus(players, stockPrice);
         }
 
+        // คำนวณกำไร/ขาดทุนของผู้เล่น
         for (auto& player : players) {
             int totalValue = player.shares * stockPrice;
             player.profit_loss = totalValue + player.cash - 50000;
         }
     }
 
-    for (auto& player : players) {//สั่งขายพร้อมเเสดงว่าอีนี่ขายได้เงินเท่านี้
+    // ขายหุ้นทั้งหมดหลังเกมจบ
+    for (auto& player : players) {
         cout << endl;
-        cout << endl;
-        sellAllShares(player, stockPrice); // ขายหุ้นทั้งหมด
+        sellAllShares(player, stockPrice);
     }
+    
     saveHistory(graph);
-    cout << endl;
     cout << endl;
     SetConsoleColor(4);
     cout << "********************************\n";
     cout << "*                              *\n";
     cout << "*";
     SetConsoleColor(14);
-    cout <<"          GAME OVER!          ";
+    cout << "          GAME OVER!          ";
     SetConsoleColor(4);
     cout << "*\n";
     cout << "*                              *\n";
@@ -311,15 +308,11 @@ int main() {
     SetConsoleColor(7);
     cout << endl;
 
-    //สรุปสถานะ
+    // สรุปผลการแข่งขัน
     displayStatus(players, stockPrice);
+    displayVictory(players);
+    rankPlayers(players);
+    ShowTitlePlayerder(players);  // แสดงฉายาผู้ชนะ
 
-    displayVictory(players);//ผู้ชนะ
-
-   
-    rankPlayers(players); // แสดงลำดับผู้ชนะ
-
-    ShowTitlePlayerder(players);//แสดงฉายา
-    
     return 0;
 }
