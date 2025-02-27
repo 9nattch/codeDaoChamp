@@ -70,21 +70,21 @@ string getTitle(const Player& player) {
     double cashRatio = player.cash / player.startingMoney;
 
     for (double trade : player.trades) {
-        if (trade >= 6000) highRiskTrades++;
-        if (trade < 3000) lowRiskTrades++;
+        if (trade >= 5000) highRiskTrades++;
+        if (trade < 4000) lowRiskTrades++;
         if (trade < 0) {
             lossTrades++;
             if (-trade > maxLoss) maxLoss = -trade;
         }
     }
 
-    if (player.cash > 150000) return "Overnight millionaire";
-    if (totalProfit >= player.startingMoney) return "The Deal Maker";
+    if (player.cash > 80000) return "Overnight millionaire";
+    if (totalProfit > player.startingMoney + 10000) return "The Deal Maker";
     if (highRiskTrades > totalTrades / 2) return "The Risk Maverick";
     if (lowRiskTrades == totalTrades) return "The Safety Guru";
     if (cashRatio >= 0.7) return "The Money Hoarder";
     if (lossTrades > 0 && player.cash > player.startingMoney) return "The Steady Investor";
-    if (player.cash < 5000) return "The Downfall King/Queen";
+    if (player.cash < 15000) return "The Downfall King/Queen";
     if (maxLoss >= player.startingMoney * 0.5) return "The One Shot Wonder";
     if (lossTrades > totalTrades / 2) return "The Jinxed Emperor";
 
