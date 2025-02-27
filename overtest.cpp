@@ -249,15 +249,21 @@ int main() {
     int graph[WIDTH], history[HISTORY_SIZE];
     loadHistory(history, graph);
 
+    pair<int, string> currentNews; // เก็บข่าวจากรอบก่อนหน้า
+
     for (int round = 1; round <= rounds; ++round) {
        
         cout << "\n=== Round " << round << " ===\n";
         
-        // สุ่มข่าวและกำหนดราคาหุ้น
-        pair<int, string> news = generateMarketNews();
-        cout << "Market News: " << news.second << "\n"; 
-        stockPrice = calculateStockPrice(news.first);
+        if (round > 1) {
+            // ใช้ข่าวที่สุ่มในรอบก่อนหน้าในการคำนวณราคาหุ้นในรอบนี้
+            stockPrice = calculateStockPrice(currentNews.first);
+        }
 
+        currentNews = generateMarketNews();
+        cout << "Market News: " << currentNews.second << "\n"; 
+
+        
         generateGraph(graph);
         displayGraph(graph);
 
