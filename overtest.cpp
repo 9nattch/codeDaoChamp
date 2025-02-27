@@ -211,7 +211,17 @@ void playerTurn(Player& player, int& stockPrice) {
             SetConsoleColor(7);
         }
     }
-}    
+} 
+
+void sellAllShares(Player& player, int stockPrice) {// ขายทั้งหมดหลังจบเกม
+    if (player.shares > 0) {
+        int revenue = player.shares * stockPrice;
+        player.cash += revenue;
+        player.shares = 0;
+        player.trades.push_back(revenue);
+        cout << player.name << " sells all shares for " << revenue << " Baht.\n";
+    }
+}
 
 
 int main() {
@@ -280,6 +290,11 @@ int main() {
         }
     }
 
+    for (auto& player : players) {//สั่งขายพร้อมเเสดงว่าอีนี่ขายได้เงินเท่านี้
+        cout << endl;
+        cout << endl;
+        sellAllShares(player, stockPrice); // ขายหุ้นทั้งหมด
+    }
     saveHistory(graph);
     cout << endl;
     cout << endl;
