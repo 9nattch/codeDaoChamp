@@ -242,6 +242,10 @@ void playerTurn(Player& player, int& stockPrice) {
             }
             SetConsoleColor(7);
         }
+    }  else if (choice == 3) {  // Skip Turn
+        SetConsoleColor(2);
+        cout << "Skipping turn...\n";
+        SetConsoleColor(7);
     }
 } 
 
@@ -268,16 +272,20 @@ int main() {
     while (true) {
         cout << "Number of players (3-5): ";
         if(cin >> numPlayers && numPlayers >= 3 && numPlayers <= 5) {
-            break;
-        } else {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            SetConsoleColor(4);
-            cout << "Invalid input! Please enter a number 3-5\n";
-            SetConsoleColor(7);
+            if (cin.peek() == '\n'){
+                break;
+            }   
         }
-    }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+        SetConsoleColor(4);
+        cout << "Invalid input! Please enter a number 3-5\n";
+        SetConsoleColor(7);
+    }
+    
+    cout << "You entered a valid number of players: " << numPlayers << endl;
+    
     vector<Player> players = initializePlayers(numPlayers);
 
     pair<int, string> news = generateMarketNews();
