@@ -7,12 +7,23 @@
 #include <cmath>
 #include <string>
 #include <iomanip>
+#include <algorithm>
 #include "player.h"
 #include "graph.h"
 #include "console.h"
 
-
 using namespace std;
+
+void displayTextArt() {
+    cout << "\n\n";
+    cout << "*****************************************\n";
+    cout << "*                                       *\n";
+    cout << "*    WELCOME TO THE TRADE RUSH GAME     *\n";
+    cout << "*                                       *\n";
+    cout << "*****************************************\n";
+    cout << "\n\n";
+}
+
 
 void displayStatus(const vector<Player>& players, int stockPrice) {
     SetConsoleColor(5);
@@ -68,6 +79,27 @@ pair<int, string> generateMarketNews() {
     return newsList[randomIndex];
 }
 
+// ฟังก์ชันสร้างกรอบ *
+void printWithBorder(const string& title, const pair<int, string>& currentNews, int round) {
+    int maxLength = max(title.length(), currentNews.second.length()); // คำนวณความกว้างของกรอบ
+    int totalWidth = maxLength + 8; // ขยายขนาดกรอบ (+6 เพื่อเว้นขอบ)
+    
+    // สร้างกรอบ *
+    string border(totalWidth, '*');
+
+    // สร้างข้อความ "ROUND X" ให้อยู่ตรงกลาง
+    string roundText = " ROUND " + to_string(round) + " ";
+    int roundPos = (totalWidth - roundText.length()) / 2; // หาตำแหน่งตรงกลาง
+    string roundLine = string(roundPos, '*') + roundText + string(totalWidth - roundPos - roundText.length(), '*');
+
+    // แสดงกรอบบน (มี "ROUND X")
+    cout << "\n\n" << roundLine << endl;
+
+    cout << "* " << setw(maxLength) << left << title << " *" << endl; // แสดงหัวข้อข่าว
+    cout << "* " << string(maxLength, '-') << " *" << endl;// เส้นคั่นระหว่างหัวข้อกับข่าว
+    cout << "* " << setw(maxLength) << left << currentNews.second << " *" << endl; // แสดงข่าว (เนื้อข่าวที่มีหมายเลขบรรทัด)
+    cout << border << endl;// แสดงกรอบล่าง
+}
 
 void playerTurn(Player& player, int& stockPrice) {
     int input, choice = 0, amount = 0;
@@ -228,6 +260,10 @@ int main() {
     SetConsoleShow("My Console App");  // ตั้งชื่อ console
     srand(time(0));  // ใช้เวลาในการสุ่มเลข
 
+    int round = 1;  // ประกาศตัวแปร round และกำหนดค่าเริ่มต้น
+
+    displayTextArt();
+
     int numPlayers;
     while (true) {
         cout << "Number of players (3-5): ";
@@ -244,6 +280,9 @@ int main() {
 
     vector<Player> players = initializePlayers(numPlayers);
 
+    pair<int, string> news = generateMarketNews();
+    string title = "Market News"; // ตัวอย่างหัวข้อ
+
     SetConsoleColor(9);  // สีฟ้า
     cout << "\n=== Randomizing Starting Money ===\n";
     SetConsoleColor(7);
@@ -256,8 +295,7 @@ int main() {
 
     pair<int, string> currentNews;  // เก็บข่าวจากรอบก่อนหน้า
 
-    for (int round = 1; round <= rounds; ++round) {
-        cout << "\n=== Round " << round << " ===\n";
+    for (round = 1; round <= rounds; ++round) {
 
         if (round > 1) {
             // ใช้ข่าวที่สุ่มในรอบก่อนหน้าในการคำนวณราคาหุ้นในรอบนี้
@@ -266,8 +304,8 @@ int main() {
 
         // สุ่มข่าวใหม่ในรอบนี้
         currentNews = generateMarketNews();  
-        cout << "Market News: " << currentNews.second << "\n";  // แสดงข่าวที่สุ่มได้
-
+        printWithBorder(title, currentNews, round);// เรียกใช้ฟังก์ชันสร้างกรอบ
+        
         // เรียกใช้ฟังก์ชัน generateGraph เพื่อสร้างกราฟที่สัมพันธ์กับข่าว
         generateGraph(graph, currentNews.first);  // ส่ง newsLine ของข่าวที่สุ่ม
         displayGraph(graph);  // แสดงกราฟ
