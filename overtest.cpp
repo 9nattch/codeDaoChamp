@@ -24,7 +24,6 @@ void displayTextArt() {
     cout << "\n\n";
 }
 
-
 void displayStatus(const vector<Player>& players, int stockPrice) {
     SetConsoleColor(5);
     cout << "\n--- Current Status ---\n";
