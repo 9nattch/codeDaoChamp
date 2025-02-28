@@ -6,7 +6,6 @@
 #include <windows.h>
 #include "console.h"
 
-
 using namespace std;
 
 void loadHistory(int history[], int graph[]) {
