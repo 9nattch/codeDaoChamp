@@ -81,7 +81,7 @@ pair<int, string> generateMarketNews() {
 // ฟังก์ชันสร้างกรอบ *
 void printWithBorder(const string& title, const pair<int, string>& currentNews, int round) {
     int maxLength = max(title.length(), currentNews.second.length()); // คำนวณความกว้างของกรอบ
-    int totalWidth = maxLength + 8; // ขยายขนาดกรอบ (+6 เพื่อเว้นขอบ)
+    int totalWidth = maxLength + 4; // ขยายขนาดกรอบ (+6 เพื่อเว้นขอบ)
     
     // สร้างกรอบ *
     string border(totalWidth, '*');
@@ -101,9 +101,9 @@ void printWithBorder(const string& title, const pair<int, string>& currentNews, 
 }
 
 void playerTurn(Player& player, int& stockPrice) {
-    int input, choice = 0, amount = 0;
+    string input;
+    int choice = 0;
 
-    // ตรวจสอบตัวเลือกให้ถูกต้อง
     while (true) {
         cout << "\n" << player.name << ", what would you like to do?\n";
         SetConsoleColor(2); cout << "[1] Buy Shares\n";
@@ -112,71 +112,64 @@ void playerTurn(Player& player, int& stockPrice) {
         SetConsoleColor(7); cout << "Choice: ";
         SetConsoleColor(6);
 
-        if (!(cin >> choice)) {
-            SetConsoleColor(0);
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            SetConsoleColor(4);
-            cout << "Invalid input! Please enter a number (1, 2, or 3).\n";
-            SetConsoleColor(7);
-            continue;
+        getline(cin, input); // อ่านอินพุตทั้งหมด
+
+        // ✅ ตรวจสอบว่า input เป็นตัวเลข และไม่มีช่องว่าง
+        if (input.length() == 1 && isdigit(input[0])) {
+            choice = input[0] - '0'; // แปลง char เป็น int
+
+            if (choice >= 1 && choice <= 3) {
+                break; // ถ้าเลือกถูกต้อง ให้ออกจาก loop
+            }
         }
 
-        if (choice == 2 && player.shares == 0) {  
-            SetConsoleColor(4);
-            cout << "You have no shares to sell! Choose another option.\n";
-            SetConsoleColor(7);
-            continue; // ให้ผู้เล่นเลือกใหม่แทนที่จะออกจากฟังก์ชัน
-        }
-
-        if (choice >= 1 && choice <= 3) {
-            break; 
-        } else {
-            SetConsoleColor(4);
-            cout << "Invalid choice! Please enter 1, 2, or 3.\n";
-            SetConsoleColor(7);
-        }
+        SetConsoleColor(4);
+        cout << "Invalid choice! Please enter 1, 2, or 3.\n";
+        SetConsoleColor(7);
     }
 
-    if (choice == 1) {  // Buy Shares
+    if (choice == 1) {  // ซื้อหุ้น
         while (true) {
             SetConsoleColor(7);
             cout << "How many shares would you like to buy? (Stock price: " << stockPrice << "): ";
             cout << "[Enter 0 to go back]\n";
             SetConsoleColor(2);
             cout << "You want to buy : ";
-    
-            double input;
-            if (!(cin >> input)) {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            getline(cin, input);
+
+            // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มบวก
+            bool isValid = true;
+            for (char c : input) {
+                if (!isdigit(c)) {
+                    isValid = false;
+                    break;
+                }
+            }
+
+            if (!isValid || input.empty()) {
                 SetConsoleColor(4);
-                cout << "Invalid input! Enter a valid number.\n";
+                cout << "Invalid input! Please enter an integer number.\n";
                 SetConsoleColor(7);
                 continue;
             }
-    
-            if (floor(input) != input) {  // ✅ ตรวจจับค่าทศนิยม
-                SetConsoleColor(4);
-                cout << "Invalid input! Please enter integer number\n";
-                SetConsoleColor(7);
-                continue;
-            }
-    
-            int amount = static_cast<int>(input);  // ✅ แปลงเป็น int หลังจากตรวจสอบแล้ว
-    
+
+            int amount = stoi(input); // แปลงเป็น int
+
             if (amount == 0) {
                 SetConsoleColor(2);
                 cout << "Returning to main menu...\n";
                 SetConsoleColor(7);
                 return playerTurn(player, stockPrice);
             }
-    
+
             if (amount < 0) {
+                SetConsoleColor(4);
                 cout << "Invalid amount! Enter a positive number.\n";
+                SetConsoleColor(7);
                 continue;
             }
-    
+
             int cost = amount * stockPrice;
             if (cost > player.cash) {
                 SetConsoleColor(4);
@@ -188,46 +181,50 @@ void playerTurn(Player& player, int& stockPrice) {
                 player.trades.push_back(-cost);
                 break;
             }
-            SetConsoleColor(7);
         }
     } 
-    else if (choice == 2) {  // Sell Shares
+    else if (choice == 2) {  // ขายหุ้น
         while (true) {
             SetConsoleColor(7);
             cout << "How many shares would you like to sell? (Stock price: " << stockPrice << "): ";
             cout << "[Enter 0 to go back]\n";
             SetConsoleColor(4);
             cout << "You want to sell : ";
-    
-            double input;
-            if (!(cin >> input)) {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Invalid input! Enter a valid number.\n";
-                continue;
+
+            getline(cin, input);
+
+            // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มบวก
+            bool isValid = true;
+            for (char c : input) {
+                if (!isdigit(c)) {
+                    isValid = false;
+                    break;
+                }
             }
-    
-            if (floor(input) != input) {  // ✅ ตรวจจับค่าทศนิยม
+
+            if (!isValid || input.empty()) {
                 SetConsoleColor(4);
-                cout << "Invalid input! Please enter integer number.\n";
+                cout << "Invalid input! Please enter an integer number.\n";
                 SetConsoleColor(7);
                 continue;
             }
-    
-            int amount = static_cast<int>(input);  // ✅ แปลงเป็น int หลังจากตรวจสอบแล้ว
-    
+
+            int amount = stoi(input); // แปลงเป็น int
+
             if (amount == 0) {
                 SetConsoleColor(2);
                 cout << "Returning to main menu...\n";
                 SetConsoleColor(7);
                 return playerTurn(player, stockPrice);
             }
-    
+
             if (amount < 0) {
+                SetConsoleColor(4);
                 cout << "Invalid amount! Enter a positive number.\n";
+                SetConsoleColor(7);
                 continue;
             }
-    
+
             if (amount > player.shares) {
                 SetConsoleColor(4);
                 cout << "Not enough shares! You only have " << player.shares << " shares.\n";
@@ -239,14 +236,14 @@ void playerTurn(Player& player, int& stockPrice) {
                 player.trades.push_back(revenue);
                 break;
             }
-            SetConsoleColor(7);
         }
-    }  else if (choice == 3) {  // Skip Turn
+    }  
+    else if (choice == 3) {  // ข้ามเทิร์น
         SetConsoleColor(2);
         cout << "Skipping turn...\n";
         SetConsoleColor(7);
     }
-} 
+}
 
 void sellAllShares(Player& player, int stockPrice) {// ขายทั้งหมดหลังจบเกม
     if (player.shares > 0) {
@@ -333,6 +330,12 @@ int main() {
     }
 
     // ขายหุ้นทั้งหมดหลังเกมจบ
+    cout << "\n\n";
+    SetConsoleColor(11);
+    cout << "--------------------------------";
+    cout << "\n=== Final Selling Phase ===\n";
+    cout << "--------------------------------";
+    cout << "\n";
     for (auto& player : players) {
         cout << endl;
         sellAllShares(player, stockPrice);
